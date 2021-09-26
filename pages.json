@@ -17,6 +17,18 @@
 			"style": {
 				"navigationBarTitleText": "人员"
 			}
+		},
+		{
+			"path": "pages/clockIn/clockIn",
+			"style": {
+				"navigationBarTitleText": "签到"
+			}
+		},
+		{
+			"path": "pages/record/recordList",
+			"style": {
+				"navigationBarTitleText": "日志"
+			}
 		}
 	],
 	"globalStyle": {
@@ -41,10 +53,22 @@
 			"text": "首页"
 		},
 		{
+			"pagePath": "pages/record/recordList",
+			"iconPath": "static/tabBar/record_default.png",
+			"selectedIconPath": "static/tabBar/record_select.png",
+			"text": "日志"
+		},
+		{
 			"pagePath": "pages/worker/workerList",
 			"iconPath": "static/tabBar/person_default.png",
 			"selectedIconPath": "static/tabBar/person_select.png",
 			"text": "人员"
+		},
+		{
+			"pagePath": "pages/clockIn/clockIn",
+			"iconPath": "static/tabBar/clockIn_default.png",
+			"selectedIconPath": "static/tabBar/clockIn_select.png",
+			"text": "签到"
 		}]
 	}
 }
