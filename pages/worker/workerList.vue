@@ -1,9 +1,10 @@
 <template>
-	<uni-list>
-	    <uni-list :border="true">
-			<uni-list-item v-for="(item,index) in workerList" :title="item.name" :note="item.workType" to="/pages/worker/worker"  :thumb="item.imgUrl" thumb-size="lg" rightText="详情>"></uni-list-item>
-	    </uni-list>
-	</uni-list>
+	<view>
+		<uni-list :border="true">
+			<uni-list-item v-for="(item,index) in workerList" :title="item.name" @click="routeToWorker(item.id)" :note="item.type" :thumb="'http://localhost:7001/'+item.imgUrl" thumb-size="lg"  link></uni-list-item>
+		</uni-list>
+		<button type="primary" class="addWorkerBtn" @click="addWorker">添加人员</button>
+	</view>
 </template>
 
 <script>
@@ -11,25 +12,30 @@ export default {
 	components: {},
 	data() {
 		return {
-			workerList: [{
-				name:'张三',
-				workType:'木工',
-				imgUrl:'https://vkceyugu.cdn.bspapp.com/VKCEYUGU-dc-site/460d46d0-4fcc-11eb-8ff1-d5dcf8779628.png'
-			}, {
-				name:'李四',
-				workType:'油工',
-				imgUrl:'https://vkceyugu.cdn.bspapp.com/VKCEYUGU-dc-site/460d46d0-4fcc-11eb-8ff1-d5dcf8779628.png'
-			}, {
-				name:'王五',
-				workType:'瓦工',
-				imgUrl:'https://vkceyugu.cdn.bspapp.com/VKCEYUGU-dc-site/460d46d0-4fcc-11eb-8ff1-d5dcf8779628.png'
-			}]
+			workerList: []
 		}
 	},
+	onShow(){
+		this.getWorkerList()
+	},
 	methods:{
-		routeToWorker(){
+		routeToWorker(id){
 			uni.navigateTo({
-				url: '/pages/worker/worker',
+				url: '/pages/worker/worker?id=' + id,
+			});
+		},
+		getWorkerList(){
+			uni.request({
+			    url: 'http://localhost:7001/worker', 
+				method: 'GET',
+			    success: (res) => {
+			       this.workerList = res.data.data
+			    }
+			});
+		},
+		addWorker(){
+			uni.navigateTo({
+				url: '/pages/worker/addWorker',
 			});
 		}
 	}
@@ -50,5 +56,16 @@ export default {
 .chat-custom-text {
 	font-size: 12px;
 	color: #999;
+}
+
+.addWorkerBtn{
+	position:absolute ;
+	bottom: 0px;
+	right: 0px;
+	left: 0px;
+	margin: 0 auto;
+}
+uni-button{
+	border-radius: 0px;
 }
 </style>

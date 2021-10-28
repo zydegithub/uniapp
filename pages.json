@@ -7,6 +7,12 @@
 			}
 		},
 		{
+			"path": "pages/record/recordList",
+			"style": {
+				"navigationBarTitleText": "日志"
+			}
+		},
+		{
 			"path": "pages/worker/workerList",
 			"style": {
 				"navigationBarTitleText": "人员"
@@ -15,7 +21,19 @@
 		{
 			"path": "pages/worker/worker",
 			"style": {
-				"navigationBarTitleText": "人员"
+				"navigationBarTitleText": "人员详情"
+			}
+		},
+		{
+			"path": "pages/worker/addWorker",
+			"style": {
+				"navigationBarTitleText": "添加人员"
+			}
+		},
+		{
+			"path": "pages/worker/workerBill",
+			"style": {
+				"navigationBarTitleText": "工资账单"
 			}
 		},
 		{

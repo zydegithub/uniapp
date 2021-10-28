@@ -3,15 +3,30 @@
 		<view class="clockInList">
 			<view class="uni-list">
 				<checkbox-group @change="checkboxChange">
-					<label class="uni-list-cell uni-list-cell-pd" v-for="item in items" :key="item.value">
+					<label class="uni-list-cell uni-list-cell-pd" v-for="item in workerList" :key="item.id">
 						<view>
-							<checkbox :value="item.value" :checked="item.checked" />{{ item.name}}
+							<checkbox :value="item.id" :checked="item.checked" />{{ item.name}}
 						</view>
 					</label>
 				</checkbox-group>
 			</view>
 		</view>
-		<button type="primary" class="clockInBtn">签     到</button>
+		<uni-popup ref="noSelect" type="message" >
+			 <uni-popup-message type="error" message="请勾选至少一个职工!"></uni-popup-message>
+		</uni-popup>
+		<uni-popup ref="noSelectDate" type="message" >
+			 <uni-popup-message type="error" message="请选择补签时间!"></uni-popup-message>
+		</uni-popup>
+		<uni-popup ref="clockIn" :mask-click="false" background-color="#fff">
+		    <uni-popup-dialog title="签 到" mode="base" type="warning" :before-close="true" @close="closeClockIn" @confirm="clockIn"></uni-popup-dialog>
+		</uni-popup>
+		<uni-popup ref="repairClockIn" :mask-click="false" background-color="#fff">
+		    <uni-popup-dialog title="签 到" mode="base" type="warning" :before-close="true" @close="closeRepairClockIn" @confirm="repairClockIn">
+				日期：<uni-datetime-picker v-model="repairClockInDate" />
+			</uni-popup-dialog>
+		</uni-popup>
+		<button type="primary" class="leftClockInBtn" @click="sureRepairclockIn">补     签</button>
+		<button type="primary" class="rightClockInBtn" @click="sureClockIn">签     到</button>
 	</view>
 </template>
 
@@ -19,44 +34,105 @@
 export default {
 	data() {
 		return {
-			items: [{
-					value: 'USA',
-					name: '美国'
-				},
-				{
-					value: 'CHN',
-					name: '中国',
-					checked: 'true'
-				},
-				{
-					value: 'BRA',
-					name: '巴西'
-				},
-				{
-					value: 'JPN',
-					name: '日本'
-				},
-				{
-					value: 'ENG',
-					name: '英国'
-				},
-				{
-					value: 'FRA',
-					name: '法国'
-				},
-				
-			],
-			current: 0
+			workerList: [],
+			checkedIdArr: [],
+			repairClockInDate: ''
 		}
 	},
+	onShow(){
+		this.getWorkerList()
+	},
 	methods: {
-		radioChange: function(evt) {
-			for (let i = 0; i < this.items.length; i++) {
-				if (this.items[i].value === evt.detail.value) {
-					this.current = i;
-					break;
-				}
+		getWorkerList(){
+			uni.request({
+			    url: 'http://localhost:7001/worker', 
+				method: 'GET',
+			    success: (res) => {
+			       this.workerList = res.data.data
+				   this.workerList.map(element=>{
+					   element.id = element.id.toString()
+					   this.$set(element, 'checked', false)
+				   })
+			    }
+			});
+		},
+		clockIn(){
+			const params = {
+				workerIdArr: this.checkedIdArr
+			};
+			var that =this
+			uni.request({
+			    url: 'http://localhost:7001/clockIn', 
+				method: 'POST',
+				data: params,
+			    success: (res) => {
+					this.$refs.clockIn.close()
+					uni.showToast({
+					    title: "签到成功" 
+					})
+					that.workerList.forEach(element=>{
+						this.$set(element, 'checked', false)
+					})
+					this.checkedIdArr = []
+			    }
+			});
+		},
+		repairClockIn(){
+			if(!this.repairClockInDate){
+				this.$refs.noSelectDate.open('center')
+				return
 			}
+			const dateArr = this.repairClockInDate.split(' ')
+			const params = {
+				workerIdArr: this.checkedIdArr,
+				date: dateArr[0],
+				time: dateArr[1]
+			};
+			uni.request({
+			    url: 'http://localhost:7001/clockIn', 
+				method: 'POST',
+				data: params,
+			    success: (res) => {
+					this.$refs.repairClockIn.close()
+					uni.showToast({
+					    title: "补签成功" 
+					})
+					this.workerList.forEach(element=>{
+						this.$set(element, 'checked', false)
+					})
+					this.checkedIdArr = []
+			    }
+			});
+		},
+		closeClockIn(){
+			this.$refs.clockIn.close()
+		},
+		closeRepairClockIn(){
+			this.$refs.repairClockIn.close()
+		},
+		sureClockIn(){
+			if(this.checkedIdArr.length === 0){
+				this.$refs.noSelect.open('center')
+				return
+			}
+			this.$refs.clockIn.open('center')
+		},
+		sureRepairclockIn(){
+			if(this.checkedIdArr.length === 0){
+				this.$refs.noSelect.open('center')
+				return
+			}
+			this.$refs.repairClockIn.open('center')
+		},
+		checkboxChange(e) {
+			this.checkedIdArr = e.detail.value
+			this.workerList.forEach(element=>{
+				if(this.checkedIdArr.includes(element.id)){
+					this.$set(element,'checked',true)
+				}else{
+					this.$set(element,'checked',false)
+				}
+			})
 		}
 	}
 }
@@ -73,20 +149,27 @@ export default {
 	.clockInList{
 		position: absolute;
 		top: 0;
-		bottom: 46px;
+		bottom: 60px;
 		left: 0;
 		right: 0;
 		overflow-y: auto;
 	}
-	.clockInBtn{
+	.leftClockInBtn{
 		position:absolute ;
-		bottom: 0px;
-		right: 0px;
-		left: 0px;
+		width: 46%;
+		bottom: 10px;
+		left: 10px;
+		margin: 0 auto;
+	}
+	.rightClockInBtn{
+		position:absolute;
+		width: 46%;
+		bottom: 10px;
+		right: 10px;
 		margin: 0 auto;
 	}
 	uni-button{
-		border-radius: 0px;
+		/* border-radius: 0px; */
 	}
 	/* 列表 */
 	.uni-list {

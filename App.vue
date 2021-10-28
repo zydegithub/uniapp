@@ -13,5 +13,8 @@
 </script>
 
 <style>
+	.ql-container{
+		min-height: 140px !important;
+	}
 	/*每个页面公共css */
 </style>
