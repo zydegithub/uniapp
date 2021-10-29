@@ -3,7 +3,7 @@
 		<uni-search-bar placeholder="搜索日志" @confirm="search" @input="input" ></uni-search-bar>
 		<view class="editor">
 			<editor placeholder="" id="editor" class="ql-container" @input="editorChange" @ready="onEditorReady"></editor>
-			<button type="primary" class="sendBtn" size="mini">发送</button>
+			<button type="primary" class="sendBtn" size="mini" @click="sendMessage">发送</button>
 		</view>
 	</view>
 </template>
@@ -31,7 +31,28 @@
 				this.editorCtx.undo()
 			},
 			editorChange(e){
-				// this.gongsijieshao = e.detail.html
+				this.editorText = e.detail.text
+			},
+			sendMessage(){
+				const params = {
+					message: this.editorText
+				}
+				uni.request({
+				    url: 'http://localhost:7001/record', 
+					method: 'POST',
+					data: params,
+				    success: (res) => {
+						debugger
+						// this.$refs.clockIn.close()
+						// uni.showToast({
+						//     title: "签到成功" 
+						// })
+						// that.workerList.forEach(element=>{
+						// 	this.$set(element, 'checked', false)
+						// })
+						// this.checkedIdArr = []
+				    }
+				});
 			}
 		},
 	}
